@@ -152,10 +152,10 @@ class Forensic_System:
         self.entity_ids: set[str | None] = set()
         self.logout_listener = None
 
-    def init(self):
+    async def init(self):
         self.iot_forensics:IotForensics = IotForensics(11)
         if self.iot_forensics:
-            self.iot_forensics.start()
+            await self.iot_forensics.start()
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     
@@ -263,8 +263,8 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         _LOGGER.warning(status)
         hass.states.set(DOMAIN+".capture_status", status)
     
-    def init(call:ServiceCall)->None:
-        hass.data[DATA_FORENSIC_SNIFFER].init()
+    async def init(call:ServiceCall)->None:
+        await hass.data[DATA_FORENSIC_SNIFFER].init()
     
     
     hass.services.async_register(
