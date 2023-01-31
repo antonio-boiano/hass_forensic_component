@@ -59,7 +59,7 @@ SERVICE_START_FEAT_CAPTURING = "start_feat_capture"
 SERVICE_DEL_CAPTURE = "delete_capture"
 SERVICE_STOP_CAPTURE = "stop_capture"
 SERVICE_GET_STATUS= "get_capture_status"
-
+SERVICE_INIT= "init_capture"
 
 
 CONFIG_SCHEMA = vol.Schema(
@@ -148,10 +148,14 @@ class Forensic_System:
     
     def __init__(self,channel:int,device_path:str,hardware_type:str):
         
-        self.iot_forensics:IotForensics = IotForensics(channel,device_path,hardware_type)
+        
         self.entity_ids: set[str | None] = set()
         self.logout_listener = None
 
+    def init(self):
+        self.iot_forensics:IotForensics = IotForensics(11)
+        if self.iot_forensics:
+            self.iot_forensics.start()
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     
@@ -179,8 +183,8 @@ async def setup_hass_events(hass: HomeAssistant, config: ConfigType) -> None:
         if  hass.data[DATA_FORENSIC_SNIFFER] :
             hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.shutdown()
 
-    if hass.data[DATA_FORENSIC_SNIFFER]:
-        await hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.start()
+    #if hass.data[DATA_FORENSIC_SNIFFER]:
+    #    await hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.start()
 
     hass.data[DATA_FORENSIC_SNIFFER].logout_listener = hass.bus.async_listen_once(
         EVENT_HOMEASSISTANT_STOP, logout
@@ -259,6 +263,9 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         _LOGGER.warning(status)
         hass.states.set(DOMAIN+".capture_status", status)
     
+    def init(call:ServiceCall)->None:
+        hass.data[DATA_FORENSIC_SNIFFER].init()
+    
     
     hass.services.async_register(
         DOMAIN,
@@ -293,4 +300,10 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         DOMAIN,
         SERVICE_GET_STATUS,
         get_capture_status,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_INIT,
+        init,
     )
