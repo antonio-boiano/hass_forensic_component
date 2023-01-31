@@ -153,9 +153,11 @@ class Forensic_System:
         self.logout_listener = None
 
     async def init(self):
+        kb=IotForensics.KillerBee()
+        
         self.iot_forensics:IotForensics = IotForensics(11)
         if self.iot_forensics:
-            await self.iot_forensics.start()
+            await self.iot_forensics.start(kb)
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     
