@@ -45,6 +45,10 @@ from .const import  (
     CONF_CSV_SEP,
     )
 
+try:
+    import killerbee
+except ImportError:
+    from . import killerbee
 
 from .core import IotForensics
 
@@ -153,8 +157,8 @@ class Forensic_System:
         self.logout_listener = None
 
     async def init(self):
-        kb=IotForensics.KillerBee()
-        
+        kb=killerbee.KillerBee()
+        _LOGGER.warning('FIND DEVICE')
         self.iot_forensics:IotForensics = IotForensics(11)
         if self.iot_forensics:
             await self.iot_forensics.start(kb)
