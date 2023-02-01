@@ -150,18 +150,15 @@ SCHEMA_SERVICE_STOP = vol.Schema(
 
 class Forensic_System:
     
-    def __init__(self,channel:int,device_path:str,hardware_type:str):
-        
-        
+    def __init__(self,channel:int=None,device_path:str=None,hardware_type:str=None,kb=None):
+        self.iot_forensics:IotForensics = IotForensics(channel=channel,dev_path=device_path,hardware=hardware_type,kb=kb)
+        self.kb=kb
         self.entity_ids: set[str | None] = set()
         self.logout_listener = None
 
     async def init(self):
-        kb=killerbee.KillerBee()
-        _LOGGER.warning('FIND DEVICE')
-        self.iot_forensics:IotForensics = IotForensics(11)
         if self.iot_forensics:
-            await self.iot_forensics.start(kb)
+            await self.iot_forensics.start()
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     
@@ -171,7 +168,9 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     hardware_type = conf.get(CONF_DEVICE_CLASS)
     snf_channel = conf.get(CONF_ZB_CHANNEL)
     try:
-        hass.data[DATA_FORENSIC_SNIFFER] = Forensic_System(snf_channel,device_path,hardware_type)
+        kb=killerbee.KillerBee(device_path,hardware_type)
+        _LOGGER.debug('FIND DEVICE')
+        hass.data[DATA_FORENSIC_SNIFFER] = Forensic_System(snf_channel,kb=kb)
     except:
         return False
         
