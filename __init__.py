@@ -64,6 +64,8 @@ SERVICE_DEL_CAPTURE = "delete_capture"
 SERVICE_STOP_CAPTURE = "stop_capture"
 SERVICE_GET_STATUS= "get_capture_status"
 SERVICE_INIT= "init_capture"
+SERVICE_START_MONITOR = "start_monitor"
+SERVICE_STOP_MONITOR = "stop_monitor"
 
 
 CONFIG_SCHEMA = vol.Schema(
@@ -152,11 +154,12 @@ class Forensic_System:
     
     def __init__(self,channel:int=None,device_path:str=None,hardware_type:str=None,kb=None):
         
-        self.kb=kb
         self.entity_ids: set[str | None] = set()
         self.logout_listener = None
         
         self.iot_forensics:IotForensics = IotForensics(snf_channel=channel,dev_path=device_path, hardware=hardware_type, kb=kb)
+        
+        self.process = None
 
     async def init(self):
         if self.iot_forensics:
@@ -173,11 +176,14 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         _LOGGER.debug('START FIND DEVICE')
         kb=killerbee.KillerBee(device=device_path,hardware=hardware_type)
         _LOGGER.debug('FIND DEVICE')
-        hass.data[DATA_FORENSIC_SNIFFER] = Forensic_System(snf_channel,kb=kb)
+        
     except Exception as e:
         _LOGGER.error(e)
-        return False
-        
+        kb=1
+        #return False
+    
+    hass.data[DATA_FORENSIC_SNIFFER] = Forensic_System(snf_channel,kb=kb)
+     
     await setup_hass_events(hass,config)
     await async_setup_hass_services(hass)
     
@@ -274,7 +280,50 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
     
     async def init(call:ServiceCall)->None:
         await hass.data[DATA_FORENSIC_SNIFFER].init()
+        
+    async def start_monitor(call:ServiceCall)->None:
+        import psutil
+        import csv
+        import asyncio
+        import datetime as dt
+        
+        async def monitor_loop(start_time=None,deltat=None,interval=None,name=None):
+            if start_time is None: start_time=dt.datetime.now()
+            if deltat is None: deltat=0
+            if interval is None: interval = 1
+            if name is None: name=f'perf'+str(start_time)[-15:]
+            write_head=1
+            
+            while not deltat or start_time+dt.timedelta(seconds=deltat)>dt.datetime.now():
+                await asyncio.sleep(interval)
+                dict={}
+                per_cpu = psutil.cpu_percent(interval=0,percpu=True)
+                mem = psutil.virtual_memory()
+                swap=psutil.swap_memory()
+
+                for idx, usage in enumerate(per_cpu):
+                    dict[f"CORE_{idx+1}"] = usage
+
+
+                dict['mem.available']=mem.available
+                dict['mem.percent']=mem.percent
+
+                dict['swap.free']=swap.free
+                dict['swap.percent']=swap.percent
+                dict['time']=dt.datetime.now()
+                
+                with open(f'./{name}.csv', 'a') as csvfile:
+                    writer = csv.DictWriter(csvfile, fieldnames=dict.keys())
+                    if write_head: 
+                        writer.writeheader()
+                        write_head = 0
+                    writer.writerow(dict)
+
+        hass.data[DATA_FORENSIC_SNIFFER].process = asyncio.create_task(monitor_loop())
     
+    async def stop_monitor(call:ServiceCall):
+        if hass.data[DATA_FORENSIC_SNIFFER].process:
+            if not hass.data[DATA_FORENSIC_SNIFFER].process.cancelled(): hass.data[DATA_FORENSIC_SNIFFER].process.cancel()
     
     hass.services.async_register(
         DOMAIN,
@@ -315,4 +364,16 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         DOMAIN,
         SERVICE_INIT,
         init,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_START_MONITOR,
+        start_monitor
+    )
+    
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_STOP_MONITOR,
+        stop_monitor
     )
