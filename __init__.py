@@ -172,7 +172,6 @@ class Forensic_System:
         if self.iot_forensics:
             await self.iot_forensics.shutdown()
             
-    
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     
@@ -183,7 +182,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     snf_channel = conf.get(CONF_ZB_CHANNEL)
     try:
         _LOGGER.debug('START FIND DEVICE')
-        kb=killerbee.KillerBee(device=device_path,hardware=hardware_type)
+        kb=await hass.async_add_executor_job(killerbee.KillerBee, device_path,hardware_type)
+        #kb=killerbee.KillerBee(device=device_path,hardware=hardware_type)
         _LOGGER.debug('FIND DEVICE')
         
     except Exception as e:
