@@ -234,7 +234,7 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         file_cfg_dict['pcap_max_packets'] = call.data.get(CONF_MAX_PACKETS)
         file_cfg_dict['pcap_split_size'] = call.data.get(CONF_SPLIT_SIZE)
         
-        await iot_feat.start_pcap_capture(snf_file_path,object_id=obj_id,file_config=file_cfg_dict)
+        await iot_feat.start_pcap_capture(snf_file_path,object_id=obj_id,file_config=file_cfg_dict,async_func_handler=hass.async_create_task)
         
     async def start_feat_capture(call: ServiceCall) -> None:
         """Start the Feature extraction capture"""
@@ -277,7 +277,7 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         
         
         
-        await iot_feat.start_features_capture(snf_file_path,obj_id,features_config=feat_cfg_dict)
+        await iot_feat.start_features_capture(snf_file_path,obj_id,features_config=feat_cfg_dict,async_func_handler=hass.async_create_task)
        
        
     async def stop_capture(call: ServiceCall) -> None:
