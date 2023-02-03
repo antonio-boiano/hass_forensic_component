@@ -181,10 +181,10 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     hardware_type = conf.get(CONF_DEVICE_CLASS)
     snf_channel = conf.get(CONF_ZB_CHANNEL)
     try:
-        _LOGGER.debug('START FIND DEVICE')
+        _LOGGER.warning('START FIND DEVICE')
         kb=await hass.async_add_executor_job(killerbee.KillerBee, device_path,hardware_type)
         #kb=killerbee.KillerBee(device=device_path,hardware=hardware_type)
-        _LOGGER.debug('FIND DEVICE')
+        _LOGGER.warning('FIND DEVICE')
         
     except Exception as e:
         _LOGGER.error(e)
