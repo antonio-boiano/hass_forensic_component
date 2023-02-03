@@ -302,12 +302,13 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         await hass.data[DATA_FORENSIC_SNIFFER].init()
         
     async def start_monitor(call:ServiceCall)->None:
-        import psutil
-        import csv
-        import asyncio
-        import datetime as dt
+
         
         async def monitor_loop(start_time=None,deltat=None,interval=None,name=None):
+            import psutil
+            import csv
+            import asyncio
+            import datetime as dt
             if start_time is None: start_time=dt.datetime.now()
             if deltat is None: deltat=0
             if interval is None: interval = 1
@@ -340,7 +341,7 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
                         write_head = 0
                     writer.writerow(dict)
 
-        hass.data[DATA_FORENSIC_SNIFFER].process = asyncio.create_task(monitor_loop())
+        hass.data[DATA_FORENSIC_SNIFFER].process = hass.async_create_task(monitor_loop())
     
     async def stop_monitor(call:ServiceCall):
         if hass.data[DATA_FORENSIC_SNIFFER].process:
