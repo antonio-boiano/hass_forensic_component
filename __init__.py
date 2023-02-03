@@ -160,10 +160,19 @@ class Forensic_System:
         self.iot_forensics:IotForensics = IotForensics(snf_channel=channel,dev_path=device_path, hardware=hardware_type, kb=kb)
         
         self.process = None
-
+        self.status=0
+        
     async def init(self):
+        self.status=1
         if self.iot_forensics:
             await self.iot_forensics.start()
+    
+    async def stop(self):
+        self.status=0
+        if self.iot_forensics:
+            await self.iot_forensics.shutdown()
+            
+    
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     
@@ -179,8 +188,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         
     except Exception as e:
         _LOGGER.error(e)
-        kb=1
-        #return False
+        return False
     
     hass.data[DATA_FORENSIC_SNIFFER] = Forensic_System(snf_channel,kb=kb)
      
@@ -193,10 +201,10 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 async def setup_hass_events(hass: HomeAssistant, config: ConfigType) -> None:
     """Home Assistant start and stop callbacks."""
 
-    def logout(event: Event) -> None:
+    async def logout(event: Event) -> None:
         """Safe close Sniffer Application."""
         if  hass.data[DATA_FORENSIC_SNIFFER] :
-            hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.shutdown()
+            await hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.shutdown()
 
     #if hass.data[DATA_FORENSIC_SNIFFER]:
     #    await hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.start()
@@ -212,7 +220,10 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
     
     async def start_pcap_capture(call: ServiceCall) -> None:
         """Start the capture of PCAP file"""
-        iot_feat:IotForensics=hass.data[DATA_FORENSIC_SNIFFER].iot_forensics        
+        iot_feat:IotForensics=hass.data[DATA_FORENSIC_SNIFFER].iot_forensics   
+        if not hass.data[DATA_FORENSIC_SNIFFER].status:
+            await hass.data[DATA_FORENSIC_SNIFFER].init()
+            
         file_cfg_dict={}
         
         obj_id=call.data.get(OBJ_ID)
@@ -227,6 +238,10 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         
     async def start_feat_capture(call: ServiceCall) -> None:
         """Start the Feature extraction capture"""
+        
+        if not hass.data[DATA_FORENSIC_SNIFFER].status:
+            await hass.data[DATA_FORENSIC_SNIFFER].init()
+            
         iot_feat:IotForensics=hass.data[DATA_FORENSIC_SNIFFER].iot_forensics 
         
         obj_id=call.data.get(OBJ_ID)
@@ -265,14 +280,19 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         await iot_feat.start_features_capture(snf_file_path,obj_id,features_config=feat_cfg_dict)
        
        
-    def stop_capture(call: ServiceCall) -> None:
+    async def stop_capture(call: ServiceCall) -> None:
         obj_id=call.data.get(OBJ_ID)
-        hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.stop_capture(obj_id)
+        await hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.stop_capture(obj_id)
         
-    def delete_capture(call: ServiceCall) -> None:
+    async def delete_capture(call: ServiceCall) -> None:
         obj_id=call.data.get(OBJ_ID)
-        hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.delete_capture_process(obj_id)
-    
+        await hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.delete_capture_process(obj_id)
+        
+        status=hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.get_status()
+        if all(value == {} or value is None  for value in status.values()) and hass.data[DATA_FORENSIC_SNIFFER].status:
+            await hass.data[DATA_FORENSIC_SNIFFER].stop()
+            
+    #ToDo get a capture status of task status https://superfastpython.com/asyncio-cancel-task/#:~:text=You%20can%20cancel%20a%20task,method%20on%20a%20Task%20object.
     def get_capture_status(call: ServiceCall)->None:
         status = hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.get_status()
         _LOGGER.warning(status)
@@ -297,6 +317,7 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
             while not deltat or start_time+dt.timedelta(seconds=deltat)>dt.datetime.now():
                 await asyncio.sleep(interval)
                 dict={}
+                cpu=psutil.cpu_percent(interval=0,percpu=False)
                 per_cpu = psutil.cpu_percent(interval=0,percpu=True)
                 mem = psutil.virtual_memory()
                 swap=psutil.swap_memory()
@@ -304,7 +325,7 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
                 for idx, usage in enumerate(per_cpu):
                     dict[f"CORE_{idx+1}"] = usage
 
-
+                dict["CORE_ALL"] = cpu
                 dict['mem.available']=mem.available
                 dict['mem.percent']=mem.percent
 
