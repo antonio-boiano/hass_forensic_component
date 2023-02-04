@@ -240,7 +240,7 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         """Start the Feature extraction capture"""
         
         if not hass.data[DATA_FORENSIC_SNIFFER].status:
-            await hass.data[DATA_FORENSIC_SNIFFER].init()
+            await hass.data[DATA_FORENSIC_SNIFFER].init(async_handler=hass.async_create_task)
             
         iot_feat:IotForensics=hass.data[DATA_FORENSIC_SNIFFER].iot_forensics 
         
