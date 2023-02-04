@@ -162,16 +162,16 @@ class Forensic_System:
         self.process = None
         self.status=0
         
-    async def init(self):
+    async def init(self,async_handler=None):
         self.status=1
         if self.iot_forensics:
-            await self.iot_forensics.start()
+            await self.iot_forensics.start(async_handler)
     
     async def stop(self):
         self.status=0
         if self.iot_forensics:
             await self.iot_forensics.shutdown()
-            
+
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     
@@ -222,7 +222,7 @@ async def async_setup_hass_services(hass: HomeAssistant) -> None:
         """Start the capture of PCAP file"""
         iot_feat:IotForensics=hass.data[DATA_FORENSIC_SNIFFER].iot_forensics   
         if not hass.data[DATA_FORENSIC_SNIFFER].status:
-            await hass.data[DATA_FORENSIC_SNIFFER].init()
+            await hass.data[DATA_FORENSIC_SNIFFER].init(async_handler=hass.async_create_task)
             
         file_cfg_dict={}
         
