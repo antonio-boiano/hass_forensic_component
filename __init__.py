@@ -165,7 +165,7 @@ class Forensic_System:
     async def init(self,async_handler=None):
         self.status=1
         if self.iot_forensics:
-            await self.iot_forensics.start(async_handler)
+            await self.iot_forensics.start(async_handler=async_handler)
     
     async def stop(self):
         self.status=0
@@ -207,7 +207,7 @@ async def setup_hass_events(hass: HomeAssistant, config: ConfigType) -> None:
             await hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.shutdown()
 
     if hass.data[DATA_FORENSIC_SNIFFER]:
-        await hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.start(async_handler=hass.async_create_task)
+        await hass.data[DATA_FORENSIC_SNIFFER].iot_forensics.start()
 
     hass.data[DATA_FORENSIC_SNIFFER].logout_listener = hass.bus.async_listen_once(
         EVENT_HOMEASSISTANT_STOP, logout
