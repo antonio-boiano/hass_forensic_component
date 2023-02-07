@@ -13,8 +13,7 @@
     "scapy",
     "wheel==0.38.4",
     "numpy",
-    "pandas",
-    "modin[all]"
+    "pandas"
   ],
   "version": "1.0.0"
 }
