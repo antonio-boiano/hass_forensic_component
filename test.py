@@ -5,7 +5,7 @@ async def main():
     iot_forensics:IotForensics = IotForensics()
 
     snf_file_path = "./forensic_capture"
-        
+    file_path = "/home/antonio/Desktop/PCPA_REPO/Test_Acquisition/4 device/HASS/SONOFF/sonoff_20min_day2_hass.pcap"
 
     feat_cfg_dict_tmp = {
     "topology_map": False,
@@ -30,7 +30,7 @@ async def main():
     #"mad_size":,
     #"mad_payload_size":,
     #"csv_separator":,
-    "pcap_file_path": "/home/antonio/Desktop/PCPA_REPO/generic_test.pcapng"
+    "pcap_file_path": file_path
     }
 
     feat_cfg_dict ={k: v for k, v in feat_cfg_dict_tmp.items() if v is not None}

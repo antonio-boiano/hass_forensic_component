@@ -110,15 +110,6 @@ start_feat_capture:
       default: "./forensic_capture"
       selector:
         text:
-    enable_topology_map:
-      name: Topology Map
-      description: Enable/Disable the feature to map the topology of the network
-      required: true
-      advanced: true
-      example: true
-      default: 1
-      selector:
-        boolean:
     time_window_size:
       name: Time Window
       description: Time window in seconds to capture the packets
@@ -129,6 +120,96 @@ start_feat_capture:
       selector:
         number:
           mode: box
+    enable_mean_inter_arrival_time:
+      name: Mean Inter Arrival Time
+      description: Enable/Disable the feature to capture the mean inter arrival time of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
+      required: true
+      advanced: true
+      example: '111'
+      default: '111'
+      selector:
+        text:
+    enable_mean_size:
+      name: Mean Size
+      description: Enable/Disable the feature to capture the mean size of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
+      required: true
+      advanced: true
+      example: '111'
+      default: '111'
+      selector:
+        text:
+    enable_mean_payload_size:
+      name: Mean Payload Size
+      description: Enable/Disable the feature to capture the mean payload size of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
+      required: true
+      advanced: true
+      example: '111'
+      default: '111'
+      selector:
+        text:
+    enable_std_inter_arrival_time:
+      name: Standard Deviation Inter Arrival Time
+      description: Enable/Disable the feature to capture the standard deviation of inter arrival time of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
+      required: true
+      advanced: true
+      example: '111'
+      default: '111'
+      selector:
+        text:
+    enable_std_size:
+      name: Standard Deviation Size
+      description: Enable/Disable the feature to capture the standard deviation of size of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
+      required: true
+      advanced: true
+      example: '111'
+      default: '111'
+      selector:
+        text:
+    enable_std_payload_size:
+      name: Standard Deviation Payload Size
+      description: Enable/Disable the feature to capture the standard deviation of payload size of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
+      required: true
+      advanced: true
+      example: '111'
+      default: '111'
+      selector:
+        text:
+    enable_mad_inter_arrival_time:
+      name: Median Absolute Deviation Inter Arrival Time
+      description: Enable/Disable the feature to capture the median absolute deviation inter arrival time of the packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
+      required: true
+      advanced: true
+      example: '111'
+      default: '111'
+      selector:
+       text:
+    enable_mad_size:
+      name: Median Absolute Deviation Size
+      description: Enable/Disable the feature to capture the median absolute deviation size of the packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
+      required: true
+      advanced: true
+      example: '111'
+      default: '111'
+      selector:
+       text:
+    enable_mad_payload_size:
+      name: Median Absolute Deviation Payload Size
+      description: Enable/Disable the feature to capture the median absolute deviation payload size of the packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
+      required: true
+      advanced: true
+      example: '111'
+      default: '111'
+      selector:
+       text:
+    enable_topology_map:
+      name: Topology Map
+      description: Enable/Disable the feature to map the topology of the network
+      required: true
+      advanced: true
+      example: true
+      default: 1
+      selector:
+        boolean:
     enable_timestamp:
       name: Timestamp
       description: Enable/Disable the timestamp of the packets when time window is 0 sec
@@ -219,87 +300,6 @@ start_feat_capture:
       default: true
       selector:
         boolean:
-    enable_mean_inter_arrival_time:
-      name: Mean Inter Arrival Time
-      description: Enable/Disable the feature to capture the mean inter arrival time of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
-      required: true
-      advanced: true
-      example: '111'
-      default: '111'
-      selector:
-        text:
-    enable_mean_size:
-      name: Mean Size
-      description: Enable/Disable the feature to capture the mean size of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
-      required: true
-      advanced: true
-      example: '111'
-      default: '111'
-      selector:
-        text:
-    enable_mean_payload_size:
-      name: Mean Payload Size
-      description: Enable/Disable the feature to capture the mean payload size of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
-      required: true
-      advanced: true
-      example: '111'
-      default: '111'
-      selector:
-        text:
-    enable_std_inter_arrival_time:
-      name: Standard Deviation Inter Arrival Time
-      description: Enable/Disable the feature to capture the standard deviation of inter arrival time of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
-      required: true
-      advanced: true
-      example: '111'
-      default: '111'
-      selector:
-        text:
-    enable_std_size:
-      name: Standard Deviation Size
-      description: Enable/Disable the feature to capture the standard deviation of size of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
-      required: true
-      advanced: true
-      example: '111'
-      default: '111'
-      selector:
-        text:
-    enable_std_payload_size:
-      name: Standard Deviation Payload Size
-      description: Enable/Disable the feature to capture the standard deviation of payload size of packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
-      required: true
-      advanced: true
-      example: '111'
-      default: '111'
-      selector:
-        text:
-    enable_mad_inter_arrival_time:
-      name: Median Absolute Deviation Inter Arrival Time
-      description: Enable/Disable the feature to capture the median absolute deviation inter arrival time of the packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
-      required: true
-      advanced: true
-      example: '111'
-      default: '111'
-      selector:
-       text:
-    enable_mad_size:
-      name: Median Absolute Deviation Size
-      description: Enable/Disable the feature to capture the median absolute deviation size of the packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
-      required: true
-      advanced: true
-      example: '111'
-      default: '111'
-      selector:
-       text:
-    enable_mad_payload_size:
-      name: Median Absolute Deviation Payload Size
-      description: Enable/Disable the feature to capture the median absolute deviation payload size of the packets 3 bit encoding bit0 = feat on incoming packets, bit1 = feat on outgoing packets, bit2= feat on total packets
-      required: true
-      advanced: true
-      example: '111'
-      default: '111'
-      selector:
-       text:
     csv_separator:
       name: CSV char separator
       description: Define the CSV separator to use to separe csv col.
